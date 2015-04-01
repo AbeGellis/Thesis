@@ -4,7 +4,7 @@ using System.Collections;
 public class ControlledPlayer : Player {
 	public KeyCode Jump, Left, Right, Shoot;
 
-	public void Update() {
+	override public void BeginStep() {
 		if (Input.GetKey (Left)) {
 			HandleInput (Controls.Left);
 		}

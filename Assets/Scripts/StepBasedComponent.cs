@@ -20,10 +20,10 @@ abstract public class StepBasedComponent : MonoBehaviour {
 		OnEndStep -= EndStep;
 	}
 
-	public void FixedUpdate() {	//TODO move into better system
-		BeginStep ();
-		Step ();
-		EndStep ();
+	public static void GameStep() {
+		OnBeginStep ();
+		OnStep ();
+		OnEndStep ();
 	}
 
 	virtual public void BeginStep() {}

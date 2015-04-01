@@ -21,6 +21,11 @@ public class Player : StepBasedComponent {
 	protected MotionComponent motion;
 	protected CollisionComponent coll;
 
+
+	public delegate void PhysicsEvent();
+	public event PhysicsEvent LeftGround;
+	public event PhysicsEvent Landed;
+
 	public void Awake() {
 		motion = GetComponent<MotionComponent> ();
 		coll = GetComponent<CollisionComponent> ();
@@ -40,7 +45,7 @@ public class Player : StepBasedComponent {
 		Movement = Movement | input;
 	}
 
-	override public void BeginStep() {
+	override public void Step() {
 		float mx = 0f, my = motion.Velocity.y; //motion.Velocity.x;
 		if ((Movement & Controls.Left) > 0)
 			mx -= MoveSpeed;
@@ -57,7 +62,9 @@ public class Player : StepBasedComponent {
 	}
 
 	public void WallHit(Direction contactDir) {
-		if (contactDir == Direction.Up || contactDir == Direction.Down)
+		if (contactDir == Direction.Up || contactDir == Direction.Down) {
 			motion.Velocity = new Vector2 (motion.Velocity.x, 0f);
+		}
+
 	}
 }
