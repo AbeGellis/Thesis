@@ -21,12 +21,9 @@ public class Player : StepBasedComponent {
 	protected MotionComponent motion;
 	protected CollisionComponent coll;
 
+	protected bool onGround;
 
-	public delegate void PhysicsEvent();
-	public event PhysicsEvent LeftGround;
-	public event PhysicsEvent Landed;
-
-	public void Awake() {
+	virtual public void Awake() {
 		motion = GetComponent<MotionComponent> ();
 		coll = GetComponent<CollisionComponent> ();
 	}
@@ -46,13 +43,24 @@ public class Player : StepBasedComponent {
 	}
 
 	override public void Step() {
+		bool grounded = (Level.current.SolidAtPoint (new Vector2 (transform.position.x, transform.position.y - coll.extents.y - .1f)));
+
+		if (!grounded && onGround) {
+			onGround = false;
+			LeftGround();
+		}
+		else if (!onGround && grounded) {
+			onGround = true;
+			Landed();
+		}
+
 		float mx = 0f, my = motion.Velocity.y; //motion.Velocity.x;
 		if ((Movement & Controls.Left) > 0)
 			mx -= MoveSpeed;
 		else if ((Movement & Controls.Right) > 0)
 			mx += MoveSpeed;
 		if ((Movement & Controls.Jump) > 0) { 
-			if (Level.current.SolidAtPoint (new Vector2 (transform.position.x, transform.position.y - coll.extents.y - .1f)))
+			if (grounded)
 				my = JumpVelocity;
 		} else if (my > 0f)
 			my = Mathf.Max (0f, my - BoostReduction);
@@ -61,10 +69,13 @@ public class Player : StepBasedComponent {
 		Movement = 0;
 	}
 
-	public void WallHit(Direction contactDir) {
+	virtual public void WallHit(Direction contactDir) {
 		if (contactDir == Direction.Up || contactDir == Direction.Down) {
 			motion.Velocity = new Vector2 (motion.Velocity.x, 0f);
 		}
 
 	}
+
+	virtual public void Landed() {}
+	virtual public void LeftGround() {}
 }
