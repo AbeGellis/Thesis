@@ -4,17 +4,22 @@ using System;
 
 public class EnemyPlayer : Player {
 	public RandomNumberGenerator RNG;
+	public Player foe;
 
 	private static Type[] _stateOptions = {
-		typeof(JumpSideways),
-		typeof(JumpInPlace)
+		typeof(JumpAcrossField),
+		typeof(JumpInPlace),
+		typeof(RunAcrossField),
+		typeof(JumpRandomly)
 	};
 
 	private EnemyState _currentState;
 	private EnemyState[] _states = new EnemyState[3];
+
 	private EnemyState GenerateState (float typeVal) {
 		return (EnemyState) Activator.CreateInstance(_stateOptions[Mathf.FloorToInt(typeVal * _stateOptions.Length)]);
 	}
+
 	private SpriteRenderer _spriteRenderer;
 
 	public void Start() {
@@ -45,8 +50,6 @@ public class EnemyPlayer : Player {
 		_states [2].OtherState [0] = _states [0];
 		_states [2].OtherState [1] = _states [1];
 
-		Array.ForEach(_states, s => s.Initialize());
-
 		SetActiveState (_states [0]);
 	}
 
@@ -54,10 +57,20 @@ public class EnemyPlayer : Player {
 		_currentState.PlanMovement ();
 	}
 
+	public override void EndStep() {
+		GameObject g = coll.CheckCollision (CollisionCategory.PlayerAttack);
+		if (g) {
+			Health -= g.GetComponent<Bullet>().Damage;
+			Destroy(g);
+		}
+	}
+
 	public void SetActiveState(EnemyState state) {
 		if (_spriteRenderer)
 			_spriteRenderer.color = Utils.HSVToRGB (state.StateHue, .75f, 1f);
-		state.Initialize ();
+		if (_currentState != null)
+			_currentState.ExitState ();
+		state.EnterState ();
 		_currentState = state;
 	}
 

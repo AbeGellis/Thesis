@@ -1,35 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//TODO randomize jumping height
+public class RunAcrossField : EnemyState {
+	protected bool _moveRight;
 
-public class JumpSideways : EnemyState {
+	override public void EnterState() {
+		base.EnterState ();
 
-	private bool _moveRight;
+		_moveRight = ToControl.foe.transform.position.x > ToControl.transform.position.x;
+		
+		//Move forward or away from player based on arg0
+		if (Arguments[0] > .5f)
+			_moveRight = !_moveRight;
+	}
 
 	override public void PlanMovement() {
 		base.PlanMovement ();
 
-		ToControl.HandleInput (Controls.Jump);
 		if (_moveRight)
 			ToControl.HandleInput (Controls.Right);
 		else
 			ToControl.HandleInput (Controls.Left);
 	}
-
-	override public void Initialize() {
-		base.Initialize ();
-
-		_moveRight = Arguments [0] > .5f;
-	}
-
+		
 	override public void WallHit(Direction contactDir) {
 		base.WallHit (contactDir);
-
+		
 		if (contactDir == Direction.Right && _moveRight) 
 			_moveRight = false;
 		if (contactDir == Direction.Left && !_moveRight) 
 			_moveRight = true;
-
+		
 	}
 }

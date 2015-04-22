@@ -15,6 +15,8 @@ public class Player : StepBasedComponent {
 	public float MoveSpeed;
 	public float JumpVelocity;
 	public float BoostReduction;
+	public int Health = 100;
+	public GameObject BulletPrefab;
 
 	protected int Movement;
 
@@ -22,6 +24,8 @@ public class Player : StepBasedComponent {
 	protected CollisionComponent coll;
 
 	protected bool onGround;
+
+	protected bool facingRight;
 
 	virtual public void Awake() {
 		motion = GetComponent<MotionComponent> ();
@@ -55,10 +59,14 @@ public class Player : StepBasedComponent {
 		}
 
 		float mx = 0f, my = motion.Velocity.y; //motion.Velocity.x;
-		if ((Movement & Controls.Left) > 0)
+		if ((Movement & Controls.Left) > 0) {
 			mx -= MoveSpeed;
-		else if ((Movement & Controls.Right) > 0)
+			facingRight = false;
+		} else if ((Movement & Controls.Right) > 0) {
 			mx += MoveSpeed;
+			facingRight = true;
+		}
+
 		if ((Movement & Controls.Jump) > 0) { 
 			if (grounded)
 				my = JumpVelocity;
@@ -69,11 +77,18 @@ public class Player : StepBasedComponent {
 		Movement = 0;
 	}
 
+
 	virtual public void WallHit(Direction contactDir) {
 		if (contactDir == Direction.Up || contactDir == Direction.Down) {
 			motion.Velocity = new Vector2 (motion.Velocity.x, 0f);
 		}
+	}
 
+	virtual public void HandleShoot(Vector2 velocity) {
+		GameObject bullet = Instantiate<GameObject> (BulletPrefab);
+		bullet.GetComponent<MotionComponent> ().Velocity = velocity;
+		bullet.GetComponent<CollisionComponent> ().Start ();
+		bullet.transform.position = transform.position + (Vector3) (3f * velocity);
 	}
 
 	virtual public void Landed() {}

@@ -18,6 +18,7 @@ public class CollisionComponent : MonoBehaviour {
 		extents = size / 2f;
 		heightvec = new Vector2 (0f, extents.y);
 		widthvec = new Vector2 (extents.x, 0f);
+		Debug.Log ("start coll");
 	}
 
 	public void SetCategory(CollisionCategory c) {

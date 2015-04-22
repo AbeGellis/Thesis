@@ -21,7 +21,6 @@ public class MotionComponent : StepBasedComponent {
 		
 
 		if (!PassThroughWalls) {
-
 			Vector3 d = transform.position - (Vector3) coll.heightvec,
 					u = transform.position + (Vector3) coll.heightvec;
 
