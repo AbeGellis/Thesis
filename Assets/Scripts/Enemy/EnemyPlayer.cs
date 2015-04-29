@@ -5,16 +5,20 @@ using System;
 public class EnemyPlayer : Player {
 	public RandomNumberGenerator RNG;
 	public Player foe;
-	
+
+	[SerializeField]
 	private EnemyState _currentState;
+	[SerializeField]
 	private EnemyState[] _states = new EnemyState[3];
 
 	private EnemyState GenerateState (float typeVal) {
-		return (EnemyState) Activator.CreateInstance(EnemyState.StateTypes[Mathf.FloorToInt(typeVal * EnemyState.StateTypes.Length)]);
+		//return (EnemyState) Activator.CreateInstance(EnemyState.StateTypes[Mathf.FloorToInt(typeVal * EnemyState.StateTypes.Length)]);
+		return (EnemyState) ScriptableObject.CreateInstance(EnemyState.StateTypes[Mathf.FloorToInt(typeVal * EnemyState.StateTypes.Length)]);
 	}
 
 	private FiringPattern GenerateFiringPattern (float typeVal) {
-		return (FiringPattern) Activator.CreateInstance(FiringPattern.PatternTypes[Mathf.FloorToInt(typeVal * FiringPattern.PatternTypes.Length)]);
+		//return (FiringPattern) Activator.CreateInstance(FiringPattern.PatternTypes[Mathf.FloorToInt(typeVal * FiringPattern.PatternTypes.Length)]);
+		return (FiringPattern) ScriptableObject.CreateInstance(FiringPattern.PatternTypes[Mathf.FloorToInt(typeVal * FiringPattern.PatternTypes.Length)]);
 	}
 
 	private SpriteRenderer _spriteRenderer;

@@ -16,7 +16,8 @@ public enum EnemyStateTransitions {
 	HealthBelow
 }
 
-public class EnemyState {
+[Serializable]
+public class EnemyState : ScriptableObject {
 	private const int MIN_TIMER = 10, MAX_TIMER = 200;
 	private const float MIN_DISTANCE = .5f, MAX_DISTANCE = 8f;
 	private const float MIN_X = .75f, MAX_X = 11.25f;

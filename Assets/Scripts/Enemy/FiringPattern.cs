@@ -2,7 +2,8 @@
 using System.Collections;
 using System;
 
-public class FiringPattern {
+[Serializable]
+public class FiringPattern : ScriptableObject {
 	public float[] Arguments = new float[2];
 
 	public static Type[] PatternTypes = {
