@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public enum EnemyStateTransitions { 
 	TimeElapsed, 
@@ -26,6 +27,13 @@ public class EnemyState {
 
 	private int _timer = 0;
 
+	public static Type[] StateTypes = {
+		typeof(JumpAcrossField),
+		typeof(JumpInPlace),
+		typeof(RunAcrossField),
+		typeof(JumpRandomly)
+	};
+
 	public static EnemyStateTransitions[] TransitionTypes = {
 		EnemyStateTransitions.TimeElapsed,
 		EnemyStateTransitions.Landing,
@@ -42,11 +50,12 @@ public class EnemyState {
 	public EnemyState[] OtherState = new EnemyState[2];
 	public float[] Arguments = new float[2];
 	public float StateHue;
+	public FiringPattern FirePattern;
 
 	public EnemyPlayer ToControl;
-
 	public virtual void EnterState() {
 		_timer = 0;
+		FirePattern.Initialize ();
 	}
 
 	public virtual void ExitState() {
@@ -85,6 +94,9 @@ public class EnemyState {
 				}
 			}
 		}
+
+		if (FirePattern.UpdateFire())
+			ToControl.HandleShoot ();
 	}
 
 	public virtual void Landed() {

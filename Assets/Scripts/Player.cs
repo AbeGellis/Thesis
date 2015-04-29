@@ -16,7 +16,9 @@ public class Player : StepBasedComponent {
 	public float JumpVelocity;
 	public float BoostReduction;
 	public int Health = 100;
-	public GameObject BulletPrefab;
+	public float ShotSpeed;
+	public GameObject[] Bullets;
+	public int ShotDelay;
 
 	protected int Movement;
 
@@ -26,6 +28,8 @@ public class Player : StepBasedComponent {
 	protected bool onGround;
 
 	protected bool facingRight;
+
+	private int _shotTimer = 0;
 
 	virtual public void Awake() {
 		motion = GetComponent<MotionComponent> ();
@@ -75,6 +79,9 @@ public class Player : StepBasedComponent {
 
 		motion.Velocity = new Vector2 (mx, my + Gravity);
 		Movement = 0;
+
+		if (_shotTimer > 0)
+			--_shotTimer;
 	}
 
 
@@ -85,10 +92,27 @@ public class Player : StepBasedComponent {
 	}
 
 	virtual public void HandleShoot(Vector2 velocity) {
-		GameObject bullet = Instantiate<GameObject> (BulletPrefab);
-		bullet.GetComponent<MotionComponent> ().Velocity = velocity;
-		bullet.GetComponent<CollisionComponent> ().Start ();
-		bullet.transform.position = transform.position + (Vector3) (3f * velocity);
+		if (_shotTimer > 0)
+			return;
+
+		foreach (GameObject b in Bullets) {
+			if (!b.activeSelf) {
+				b.SetActive(true);
+				b.GetComponent<MotionComponent> ().Velocity = velocity;
+				b.GetComponent<CollisionComponent> ().Start ();
+				b.transform.position = new Vector2(transform.position.x + (velocity.x > 0 ? coll.extents.x : -coll.extents.x), 
+				                                   transform.position.y);
+
+				_shotTimer = ShotDelay;
+				return;
+			}
+		}
+	
+	}
+
+	public void HandleShoot() {
+		Vector2 velocity = facingRight ? Vector2.right * ShotSpeed : Vector2.right * -ShotSpeed;
+		HandleShoot (velocity);
 	}
 
 	virtual public void Landed() {}

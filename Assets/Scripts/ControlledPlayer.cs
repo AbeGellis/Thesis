@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ControlledPlayer : Player {
 	public KeyCode Jump, Left, Right, Shoot;
-	public float shotSpeed;
+
 	override public void BeginStep() {
 		if (Input.GetKey (Left)) {
 			HandleInput (Controls.Left);
@@ -15,7 +15,7 @@ public class ControlledPlayer : Player {
 			HandleInput (Controls.Jump);
 		}
 		if (Input.GetKey (Shoot)) {
-			HandleShoot (facingRight ? Vector2.right * shotSpeed: Vector2.right * shotSpeed);
+			HandleShoot ();
 		}
 	}
 }

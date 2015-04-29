@@ -8,9 +8,10 @@ public class Bullet : StepBasedComponent {
 
 	public void Start() {
 		GetComponent<MotionComponent> ().OnWallHit += WallHit;
+		gameObject.SetActive (false);
 	}
 
 	void WallHit(Direction contactDir) {
-		Destroy (gameObject);	//TODO pooling?
+		gameObject.SetActive (false);
 	}
 }

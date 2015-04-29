@@ -5,19 +5,16 @@ using System;
 public class EnemyPlayer : Player {
 	public RandomNumberGenerator RNG;
 	public Player foe;
-
-	private static Type[] _stateOptions = {
-		typeof(JumpAcrossField),
-		typeof(JumpInPlace),
-		typeof(RunAcrossField),
-		typeof(JumpRandomly)
-	};
-
+	
 	private EnemyState _currentState;
 	private EnemyState[] _states = new EnemyState[3];
 
 	private EnemyState GenerateState (float typeVal) {
-		return (EnemyState) Activator.CreateInstance(_stateOptions[Mathf.FloorToInt(typeVal * _stateOptions.Length)]);
+		return (EnemyState) Activator.CreateInstance(EnemyState.StateTypes[Mathf.FloorToInt(typeVal * EnemyState.StateTypes.Length)]);
+	}
+
+	private FiringPattern GenerateFiringPattern (float typeVal) {
+		return (FiringPattern) Activator.CreateInstance(FiringPattern.PatternTypes[Mathf.FloorToInt(typeVal * FiringPattern.PatternTypes.Length)]);
 	}
 
 	private SpriteRenderer _spriteRenderer;
@@ -26,12 +23,13 @@ public class EnemyPlayer : Player {
 		_spriteRenderer = GetComponent<SpriteRenderer> ();
 
 		for (int i = 0; i < 3; ++i) {
-			float val = RNG.GenerateValue("State " + i.ToString() + " type");
+			float val = RNG.GenerateValue("State " + i.ToString() + " Type");
 			_states[i] = GenerateState(val);
 
 			_states[i].ToControl = this;
 
-			_states[i].StateHue = RNG.GenerateValue("State " + i.ToString() + " hue");
+			_states[i].StateHue = RNG.GenerateValue("State " + i.ToString() + " Hue");
+
 			for (int j = 0; j < 2; ++j) 
 				_states[i].Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Argument " + j.ToString());
 			for (int j = 0; j < 2; ++j) {
@@ -41,6 +39,12 @@ public class EnemyPlayer : Player {
 				_states[i].TransitionArguments[j] = 
 					RNG.GenerateValue("State " + i.ToString() + " Transition Argument " + j.ToString());
 			}
+
+			val = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Type");
+			_states[i].FirePattern = GenerateFiringPattern(val);
+
+			for (int j = 0; j < 2; ++j) 
+				_states[i].FirePattern.Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Argument " + j.ToString());
 		}
 
 		_states [0].OtherState [0] = _states [1];
@@ -61,7 +65,7 @@ public class EnemyPlayer : Player {
 		GameObject g = coll.CheckCollision (CollisionCategory.PlayerAttack);
 		if (g) {
 			Health -= g.GetComponent<Bullet>().Damage;
-			Destroy(g);
+			g.SetActive(false);
 		}
 	}
 
