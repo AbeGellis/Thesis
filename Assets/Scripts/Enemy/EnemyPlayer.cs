@@ -5,11 +5,12 @@ using System;
 public class EnemyPlayer : Player {
 	public RandomNumberGenerator RNG;
 	public Player foe;
+	public bool UseSeed;
+	public int Seed;
 
-	[SerializeField]
-	private EnemyState _currentState;
-	[SerializeField]
-	private EnemyState[] _states = new EnemyState[3];
+
+	public EnemyState CurrentState;
+	public EnemyState[] States = new EnemyState[3];
 
 	private EnemyState GenerateState (float typeVal) {
 		//return (EnemyState) Activator.CreateInstance(EnemyState.StateTypes[Mathf.FloorToInt(typeVal * EnemyState.StateTypes.Length)]);
@@ -24,45 +25,48 @@ public class EnemyPlayer : Player {
 	private SpriteRenderer _spriteRenderer;
 
 	public void Start() {
+		if (UseSeed)
+			UnityEngine.Random.seed = Seed;
+
 		_spriteRenderer = GetComponent<SpriteRenderer> ();
 
 		for (int i = 0; i < 3; ++i) {
 			float val = RNG.GenerateValue("State " + i.ToString() + " Type");
-			_states[i] = GenerateState(val);
+			States[i] = GenerateState(val);
 
-			_states[i].ToControl = this;
+			States[i].ToControl = this;
 
-			_states[i].StateHue = RNG.GenerateValue("State " + i.ToString() + " Hue");
+			States[i].StateHue = RNG.GenerateValue("State " + i.ToString() + " Hue");
 
 			for (int j = 0; j < 2; ++j) 
-				_states[i].Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Argument " + j.ToString());
+				States[i].Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Argument " + j.ToString());
 			for (int j = 0; j < 2; ++j) {
 				float transitionType = RNG.GenerateValue("State " + i.ToString() + " Transition Type " + j.ToString());
-				_states[i].TransitionConditions[j] = 
+				States[i].TransitionConditions[j] = 
 					EnemyState.TransitionTypes[Mathf.FloorToInt(transitionType * EnemyState.TransitionTypes.Length)];
-				_states[i].TransitionArguments[j] = 
+				States[i].TransitionArguments[j] = 
 					RNG.GenerateValue("State " + i.ToString() + " Transition Argument " + j.ToString());
 			}
 
 			val = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Type");
-			_states[i].FirePattern = GenerateFiringPattern(val);
+			States[i].FirePattern = GenerateFiringPattern(val);
 
 			for (int j = 0; j < 2; ++j) 
-				_states[i].FirePattern.Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Argument " + j.ToString());
+				States[i].FirePattern.Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Argument " + j.ToString());
 		}
 
-		_states [0].OtherState [0] = _states [1];
-		_states [0].OtherState [1] = _states [2];
-		_states [1].OtherState [0] = _states [0];
-		_states [1].OtherState [1] = _states [2];
-		_states [2].OtherState [0] = _states [0];
-		_states [2].OtherState [1] = _states [1];
+		States [0].OtherState [0] = States [1];
+		States [0].OtherState [1] = States [2];
+		States [1].OtherState [0] = States [0];
+		States [1].OtherState [1] = States [2];
+		States [2].OtherState [0] = States [0];
+		States [2].OtherState [1] = States [1];
 
-		SetActiveState (_states [0]);
+		SetActiveState (States [0]);
 	}
 
 	public override void BeginStep() {
-		_currentState.PlanMovement ();
+		CurrentState.PlanMovement ();
 	}
 
 	public override void EndStep() {
@@ -76,10 +80,10 @@ public class EnemyPlayer : Player {
 	public void SetActiveState(EnemyState state) {
 		if (_spriteRenderer)
 			_spriteRenderer.color = Utils.HSVToRGB (state.StateHue, .75f, 1f);
-		if (_currentState != null)
-			_currentState.ExitState ();
+		if (CurrentState != null)
+			CurrentState.ExitState ();
 		state.EnterState ();
-		_currentState = state;
+		CurrentState = state;
 	}
 
 	new public void HandleInput(int input) {
@@ -88,10 +92,10 @@ public class EnemyPlayer : Player {
 
 	override public void Landed() {
 		base.Landed();
-		_currentState.Landed();
+		CurrentState.Landed();
 	}
 	override public void WallHit(Direction contactDir) {
 		base.WallHit (contactDir);
-		_currentState.WallHit (contactDir);
+		CurrentState.WallHit (contactDir);
 	}
 }

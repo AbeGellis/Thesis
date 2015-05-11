@@ -17,7 +17,7 @@ public enum EnemyStateTransitions {
 }
 
 [Serializable]
-public class EnemyState : ScriptableObject {
+public class EnemyState : ScriptableObject, ICloneable {
 	private const int MIN_TIMER = 10, MAX_TIMER = 200;
 	private const float MIN_DISTANCE = .5f, MAX_DISTANCE = 8f;
 	private const float MIN_X = .75f, MAX_X = 11.25f;
@@ -34,6 +34,10 @@ public class EnemyState : ScriptableObject {
 		typeof(RunAcrossField),
 		typeof(JumpRandomly)
 	};
+	
+	public object Clone() {
+		return this.MemberwiseClone ();
+	}
 
 	public static EnemyStateTransitions[] TransitionTypes = {
 		EnemyStateTransitions.TimeElapsed,

@@ -9,7 +9,7 @@ public static class Controls {
 }
 
 [RequireComponent(typeof(MotionComponent))]
-public class Player : StepBasedComponent {
+public class Player : StepBasedComponent, System.ICloneable {
 
 	public float Gravity;
 	public float MoveSpeed;
@@ -30,6 +30,21 @@ public class Player : StepBasedComponent {
 	protected bool facingRight;
 
 	private int _shotTimer = 0;
+
+	public void CopyFrom(Player original) {
+		Gravity = original.Gravity;
+		MoveSpeed = original.MoveSpeed;
+		JumpVelocity = original.JumpVelocity;
+		BoostReduction = original.BoostReduction;
+		Health = original.Health;
+		ShotSpeed = original.ShotSpeed;
+		Bullets = original.Bullets;			//TODO serialize bullet active state
+		ShotDelay = original.ShotDelay;
+
+		facingRight = original.facingRight;
+		_shotTimer = original._shotTimer;
+		onGround = original.onGround;
+	}
 
 	virtual public void Awake() {
 		motion = GetComponent<MotionComponent> ();

@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-abstract public class StepBasedComponent : MonoBehaviour {
+abstract public class StepBasedComponent : MonoBehaviour, System.ICloneable {
+	public static int Frame;
+
 
 	delegate void StepEvent();
 	static event StepEvent OnBeginStep;
@@ -21,9 +23,16 @@ abstract public class StepBasedComponent : MonoBehaviour {
 	}
 
 	public static void GameStep() {
+		Random.seed = Frame;
 		OnBeginStep ();
 		OnStep ();
 		OnEndStep ();
+		++Frame;
+	}
+
+	
+	public object Clone() {
+		return this.MemberwiseClone ();
 	}
 
 	virtual public void BeginStep() {}
