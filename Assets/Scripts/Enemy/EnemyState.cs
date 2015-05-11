@@ -16,8 +16,7 @@ public enum EnemyStateTransitions {
 	HealthBelow
 }
 
-[Serializable]
-public class EnemyState : ScriptableObject, ICloneable {
+public class EnemyState {
 	private const int MIN_TIMER = 10, MAX_TIMER = 200;
 	private const float MIN_DISTANCE = .5f, MAX_DISTANCE = 8f;
 	private const float MIN_X = .75f, MAX_X = 11.25f;
@@ -34,10 +33,47 @@ public class EnemyState : ScriptableObject, ICloneable {
 		typeof(RunAcrossField),
 		typeof(JumpRandomly)
 	};
-	
-	public object Clone() {
-		return this.MemberwiseClone ();
+
+	/*public EnemyState() {}
+
+	public EnemyState(EnemyState original) {
+		Array.Copy (original.Arguments, Arguments, Arguments.Length);
+		Array.Copy (original.TransitionArguments, TransitionArguments, TransitionArguments.Length);
+		_timer = original._timer;
+		TransitionConditions = original.TransitionConditions;
+		StateHue = original.StateHue;
+		FirePattern = (FiringPattern) System.Activator.CreateInstance(original.FirePattern.GetType(), original.FirePattern);
+		ToControl = original.ToControl;
+	}*/
+
+	public virtual EnemyState CreateCopy() {
+		EnemyState copy = (EnemyState) Activator.CreateInstance(this.GetType());
+		Array.Copy (Arguments, copy.Arguments, Arguments.Length);
+		Array.Copy (TransitionArguments, copy.TransitionArguments, TransitionArguments.Length);
+		copy._timer = _timer;
+		copy.TransitionConditions = TransitionConditions;
+		copy.StateHue = StateHue;
+		copy.FirePattern = FirePattern.CreateCopy ();
+		copy.ToControl = ToControl;
+
+		if (typeof(RunAcrossField).IsAssignableFrom(this.GetType ())) 
+			((RunAcrossField)copy).MoveRight = ((RunAcrossField)this).MoveRight;
+
+		return copy;
 	}
+
+	/*virtual public object Clone() {
+		EnemyState copy = new EnemyState ();
+		copy.Arguments = new float[Arguments.Length];
+		Array.Copy (Arguments, copy.Arguments, Arguments.Length);
+		copy._timer = _timer;
+		copy.TransitionConditions = TransitionConditions;
+		copy.TransitionArguments = new float[TransitionArguments.Length];
+		Array.Copy (TransitionArguments, copy.TransitionArguments, TransitionArguments.Length);
+		copy.StateHue = StateHue;
+		copy.FirePattern = (FiringPattern) FirePattern.Clone();
+		return copy;
+	}*/
 
 	public static EnemyStateTransitions[] TransitionTypes = {
 		EnemyStateTransitions.TimeElapsed,

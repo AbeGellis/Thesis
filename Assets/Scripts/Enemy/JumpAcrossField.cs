@@ -5,9 +5,9 @@ using System.Collections;
 
 public class JumpAcrossField : RunAcrossField {
 
-	override public void Landed() {
-		_moveRight = (Random.Range (0, 2) == 1);
+	override public void PlanMovement() {
+		base.PlanMovement ();
+		
+		ToControl.HandleInput (Controls.Jump);
 	}
-
-
 }

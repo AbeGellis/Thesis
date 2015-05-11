@@ -2,10 +2,7 @@
 using System.Collections;
 
 public class JumpRandomly : JumpAcrossField {
-
-	override public void PlanMovement() {
-		base.PlanMovement ();
-		
-		ToControl.HandleInput (Controls.Jump);
+	override public void Landed() {
+		MoveRight = (Random.Range (0, 2) == 1);
 	}
 }

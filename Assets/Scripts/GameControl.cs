@@ -28,8 +28,21 @@ public class GameState {
 		EnemyState.Character = e;
 		EnemyState.Velocity = enemy.GetComponent<MotionComponent> ().Velocity;
 		EnemyState.Position = enemy.transform.position;
-		EnemyStateState = (EnemyState) e.CurrentState.Clone ();
-		ToReplace = e.CurrentState;
+
+		EnemyStates = new EnemyState[e.States.Length];
+		for (int i = 0; i < e.States.Length; ++i) {
+			EnemyStates[i] = e.States[i].CreateCopy();
+			if (e.States[i] == e.CurrentState)
+				CurrentState = EnemyStates[i];
+		}
+
+		EnemyStates [0].OtherState [0] = EnemyStates [1];
+		EnemyStates [0].OtherState [1] = EnemyStates [2];
+		EnemyStates [1].OtherState [0] = EnemyStates [0];
+		EnemyStates [1].OtherState [1] = EnemyStates [2];
+		EnemyStates [2].OtherState [0] = EnemyStates [0];
+		EnemyStates [2].OtherState [1] = EnemyStates [1];
+
 
 		for (int i = 0; i < bullets.Length; ++i) {
 			BulletStates[i] = new BulletState();
@@ -39,12 +52,13 @@ public class GameState {
 		}
 
 		ancestor = currentState;
+		Frame = currentState != null ? currentState.Frame + 1 : 0;
 	}
 
 	public CharacterState EnemyState, PlayerState;
 	public BulletState[] BulletStates;
-	public EnemyState EnemyStateState, //Cloned to preserve current data
-			ToReplace; //A reference to the state to override with the clone
+	public EnemyState[] EnemyStates;
+	public EnemyState CurrentState;
 	public int Frame;
 
 	public GameState ancestor;
@@ -61,11 +75,10 @@ public class GameState {
 		e.transform.position = EnemyState.Position;
 
 		for (int i = 0; i < e.States.Length; ++i) {
-			if (e.States[i] == ToReplace) {
-				e.States[i] = EnemyStateState;
-				e.CurrentState = EnemyStateState;
-				e.GetComponent<SpriteRenderer>().color = Utils.HSVToRGB (EnemyStateState.StateHue, .75f, 1f);
-				break;
+			e.States[i] = EnemyStates[i];
+			if (EnemyStates[i] == CurrentState) {
+				e.CurrentState = e.States[i];
+				e.GetComponent<SpriteRenderer>().color = Utils.HSVToRGB (e.CurrentState.StateHue, .75f, 1f);
 			}
 		}
 
@@ -74,6 +87,8 @@ public class GameState {
 			bullets[i].transform.position = BulletStates[i].Position;
 			bullets[i].GetComponent<MotionComponent>().Velocity = BulletStates[i].Velocity;
 		}
+
+		StepBasedComponent.Frame = Frame;
 	}
 }
 
@@ -90,14 +105,13 @@ public class GameControl : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (!Input.GetKey (KeyCode.Tab)) {
-			StepBasedComponent.GameStep ();
 			g.AddLast(new GameState(Hero, Enemy, Bullets, g.Count > 0 ? g.Last.Value : null));
+			StepBasedComponent.GameStep ();
 		}
 		else {
 			if (g.Count > 0) {
 				g.Last.Value.RestoreGameState(Hero, Enemy, Bullets);
 				g.RemoveLast();
-				StepBasedComponent.Frame--;
 			}
 		}
 
