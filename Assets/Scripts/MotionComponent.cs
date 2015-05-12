@@ -56,7 +56,5 @@ public class MotionComponent : StepBasedComponent {
 				OnWallHit(Direction.None);
 		}
 
-		Debug.DrawLine (transform.position - (Vector3)coll.extents, transform.position + (Vector3)coll.extents, Color.blue);
-
 	}
 }

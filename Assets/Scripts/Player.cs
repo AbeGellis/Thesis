@@ -26,10 +26,10 @@ public class Player : StepBasedComponent, System.ICloneable {
 	protected CollisionComponent coll;
 
 	protected bool onGround;
-
+	protected bool rising;
 	protected bool facingRight;
 
-	private int _shotTimer = 0;
+	protected int shotTimer = 0;
 
 	public void CopyFrom(Player original) {
 		Gravity = original.Gravity;
@@ -42,7 +42,7 @@ public class Player : StepBasedComponent, System.ICloneable {
 		ShotDelay = original.ShotDelay;
 
 		facingRight = original.facingRight;
-		_shotTimer = original._shotTimer;
+		shotTimer = original.shotTimer;
 		onGround = original.onGround;
 	}
 
@@ -87,16 +87,26 @@ public class Player : StepBasedComponent, System.ICloneable {
 		}
 
 		if ((Movement & Controls.Jump) > 0) { 
-			if (grounded)
+			if (grounded) {
 				my = JumpVelocity;
-		} else if (my > 0f)
-			my = Mathf.Max (0f, my - BoostReduction);
+				rising = true;
+			}
+		} else if (my > 0f) {
+			if (rising) {
+				my = Mathf.Max (0f, my - BoostReduction);
+				rising = false;
+			}
+		} else
+			rising = false;
+
+		if ((Movement & Controls.Shoot) > 0)
+			HandleShoot ();
 
 		motion.Velocity = new Vector2 (mx, my + Gravity);
 		Movement = 0;
 
-		if (_shotTimer > 0)
-			--_shotTimer;
+		if (shotTimer > 0)
+			--shotTimer;
 	}
 
 
@@ -107,7 +117,7 @@ public class Player : StepBasedComponent, System.ICloneable {
 	}
 
 	virtual public void HandleShoot(Vector2 velocity) {
-		if (_shotTimer > 0)
+		if (shotTimer > 0)
 			return;
 
 		foreach (GameObject b in Bullets) {
@@ -118,7 +128,7 @@ public class Player : StepBasedComponent, System.ICloneable {
 				b.transform.position = new Vector2(transform.position.x + (velocity.x > 0 ? coll.extents.x : -coll.extents.x), 
 				                                   transform.position.y);
 
-				_shotTimer = ShotDelay;
+				shotTimer = ShotDelay;
 				return;
 			}
 		}

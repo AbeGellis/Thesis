@@ -137,7 +137,7 @@ public class EnemyState {
 		}
 
 		if (FirePattern.UpdateFire())
-			ToControl.HandleShoot ();
+			ToControl.HandleInput (Controls.Shoot);
 	}
 
 	public virtual void Landed() {

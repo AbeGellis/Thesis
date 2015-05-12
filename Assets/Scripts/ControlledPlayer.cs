@@ -15,7 +15,7 @@ public class ControlledPlayer : Player {
 			HandleInput (Controls.Jump);
 		}
 		if (Input.GetKey (Shoot)) {
-			HandleShoot ();
+			HandleInput (Controls.Shoot);
 		}
 	}
 }
