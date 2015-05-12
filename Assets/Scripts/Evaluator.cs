@@ -92,8 +92,10 @@ public class Evaluator : MonoBehaviour {
 						StepBasedComponent.GameStep ();
 					GameState m = new GameState (Hero, Enemy, Bullets, g);
 					if (m.PlayerState.Character.Health > 0) {
-						if (m.EnemyState.Character.Health == 0)
-							Debug.Log (m.Frame);
+						if (m.EnemyState.Character.Health == 0) {
+							Debug.Log("Boss is beatable!");
+							yield break;
+						}
 						ToExplore.Add (CalculatePriority (m), m);
 					}
 				}
