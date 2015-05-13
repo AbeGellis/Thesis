@@ -106,6 +106,7 @@ public class EnemyDataHandler : MonoBehaviour {
 			foreach (EnemyValues e in EnemyData)
 				output += e.ID + " ";
 			output += " pass the first test.";
+			Debug.Log (output);
 			Application.LoadLevel("beatabletest");
 		}
 		if (sender.GetType() == typeof(BeatableEvaluator)) {

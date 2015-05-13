@@ -21,11 +21,12 @@ public class RandomEvaluator : Evaluator {
 	}
 
 	public IEnumerator Simulate(List<int> commands, int renderFrequency) {
+		yield return new WaitForEndOfFrame ();
 		int timer = renderFrequency;
 
 		for (int i = 0; i < commands.Count; ++i) {
 			Hero.InputPressed = commands[i];
-			for (int j = 0; j < Granularity; ++j) {
+			for (int j = 0; j < CycleLength; ++j) {
 				StepBasedComponent.GameStep();
 
 				--timer;

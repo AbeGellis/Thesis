@@ -8,7 +8,7 @@ public abstract class Evaluator : MonoBehaviour {
 	public Bullet[] Bullets;
 	public int RenderFrequency = 5;
 	public int SimulationDepth = 30;
-	public int Granularity = 2;
+	public int CycleLength = 2;
 
 	
 	public delegate void EvaluationEvent(Evaluator sender, int data = 0);

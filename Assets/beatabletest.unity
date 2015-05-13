@@ -711,7 +711,6 @@ MonoBehaviour:
   - {fileID: 716979018}
   - {fileID: 1597527577}
   ShotDelay: 5
-  RNG: {fileID: 1099461515}
   foe: {fileID: 1749927297}
   UseSeed: 0
   Seed: 15
@@ -1000,8 +999,8 @@ MonoBehaviour:
   - {fileID: 744999322}
   - {fileID: 1859234772}
   RenderFrequency: 1000
-  MaxSimulationDepth: 30
-  Granularity: 10
+  SimulationDepth: 25
+  CycleLength: 20
 --- !u!1 &1573039598 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 162612, guid: b036caadbb316ea47a2f79bf9955b2b3, type: 2}

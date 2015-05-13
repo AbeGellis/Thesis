@@ -70,6 +70,7 @@ public class BeatableEvaluator : Evaluator {
 	}
 
 	public IEnumerator Simulate(int maxDepth, int renderFrequency) {
+		yield return new WaitForEndOfFrame ();
 		int timer = renderFrequency;
 
 		while (ToExplore.Count != 0) {
@@ -91,7 +92,7 @@ public class BeatableEvaluator : Evaluator {
 					g.RestoreGameState ((Player)Hero, Enemy, Bullets);
 					if (Hero.UsefulInput (i)) {
 						Hero.InputPressed = i;
-						for (int j = Granularity; j > 0; --j) {
+						for (int j = CycleLength; j > 0; --j) {
 							StepBasedComponent.GameStep ();
 							--timer;
 							if (timer <= 0) {

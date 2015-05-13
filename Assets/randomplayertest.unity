@@ -710,7 +710,6 @@ MonoBehaviour:
   - {fileID: 716979018}
   - {fileID: 1597527577}
   ShotDelay: 5
-  RNG: {fileID: 0}
   foe: {fileID: 1749927297}
   UseSeed: 0
   Seed: 15
@@ -989,7 +988,7 @@ MonoBehaviour:
   - {fileID: 1859234772}
   RenderFrequency: 5
   SimulationDepth: 25
-  Granularity: 20
+  CycleLength: 20
   commands: 
 --- !u!1 &1573039598 stripped
 GameObject:
@@ -1311,8 +1310,9 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 2004522161}
+  - 114: {fileID: 2004522162}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Enemy Data Handler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1325,11 +1325,23 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2004522160}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.02999973, y: 3, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
+--- !u!114 &2004522162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2004522160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 952d363933d4ba34db3e0356996f214e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnemyCount: 10
 --- !u!1001 &2043955284
 Prefab:
   m_ObjectHideFlags: 0
