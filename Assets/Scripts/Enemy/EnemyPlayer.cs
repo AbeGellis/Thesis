@@ -98,4 +98,11 @@ public class EnemyPlayer : Player {
 		base.WallHit (contactDir);
 		CurrentState.WallHit (contactDir);
 	}
+
+	override public GameObject HandleShoot(Vector2 v) {
+		GameObject b = base.HandleShoot (v);
+		if (b != null)
+			b.GetComponent<SpriteRenderer> ().color = _spriteRenderer.color;
+		return b;
+	}
 }

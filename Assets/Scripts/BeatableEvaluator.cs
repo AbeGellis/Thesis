@@ -3,14 +3,32 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-public class Evaluator : MonoBehaviour {
+public class BeatableEvaluator : MonoBehaviour {
 	public ComputerControlledPlayer Hero;
 	public Player Enemy;
 	public Bullet[] Bullets;
-	public int Granularity = 1;
+	public int RenderFrequency = 5;
 	public int MaxSimulationDepth = 30;
+	
+	public int Granularity = 2;
 
-	public struct Priority : IComparable {
+	void Awake() {
+		UnityEngine.Random.seed = (int) System.DateTime.Now.Ticks;
+	}
+
+	public class HealthHeuristic : IComparer<Priority> {
+		public int Compare(Priority p1, Priority p2) {
+			if (p1.PrimaryVal == p2.PrimaryVal) {
+				if (p1.SecondaryVal == p2.SecondaryVal) {
+					return Math.Sign(p1.id - p2.id);
+				}
+				return Math.Sign(p1.SecondaryVal - p2.SecondaryVal);
+			}
+			return p1.PrimaryVal - p2.PrimaryVal;
+		}
+	}
+
+	public struct Priority {
 		static long current_id = long.MinValue;
 
 		public Priority(int val1, float val2) {
@@ -21,18 +39,13 @@ public class Evaluator : MonoBehaviour {
 		}
 		public int PrimaryVal;
 		public float SecondaryVal;
-		private long id;
+		public long id;
 
 		public int CompareTo(object other) {
 			if (other.GetType () == typeof(Priority))
 				return CompareTo ((Priority)other);
 			else
 				return 0;
-		}
-
-		public int CompareTo(Priority other) {
-			//return (PrimaryVal == other.PrimaryVal ? (PrimaryVal - other.PrimaryVal) : -1);
-			return (PrimaryVal == other.PrimaryVal ? (SecondaryVal == other.SecondaryVal ? Math.Sign(id - other.id) : (int) Mathf.Sign(SecondaryVal - other.SecondaryVal)) : PrimaryVal - other.PrimaryVal);
 		}
 	}
 
@@ -46,8 +59,8 @@ public class Evaluator : MonoBehaviour {
 			if (b.activeSelf)
 				BulletDist = Mathf.Min (BulletDist, Vector2.SqrMagnitude ((Vector2) b.transform.position - ePos));
 		}
-		if (BulletDist == float.MaxValue)
-			BulletDist = Mathf.Min (BulletDist, Vector2.SqrMagnitude ((Vector2) state.PlayerState.Position - ePos));
+		//if (BulletDist == float.MaxValue)
+		//	BulletDist = Mathf.Min (BulletDist, Vector2.SqrMagnitude ((Vector2) state.PlayerState.Position - ePos));
 
 		return new Priority (HPDiff, BulletDist);
 	}
@@ -55,13 +68,18 @@ public class Evaluator : MonoBehaviour {
 	private SortedDictionary<Priority,GameState> ToExplore;
 
 	void Start () {
-		ToExplore = new SortedDictionary<Priority, GameState> ();
+		ToExplore = new SortedDictionary<Priority, GameState> (new HealthHeuristic());
 		GameState g = new GameState (Hero, Enemy, Bullets, null);
 		ToExplore.Add (CalculatePriority (g), g);
 		Time.timeScale = 100f;
-		StartCoroutine (Simulate(MaxSimulationDepth,10));
+		StartCoroutine (Simulate(MaxSimulationDepth,RenderFrequency));
 	}
 
+	void OnDisable() {
+		Time.timeScale = 1f;
+	}
+
+	//TODO use maxDepth
 	public IEnumerator Simulate(int maxDepth, int dequeuesPerUpdate) {
 		int timer = dequeuesPerUpdate;
 
@@ -93,7 +111,8 @@ public class Evaluator : MonoBehaviour {
 					GameState m = new GameState (Hero, Enemy, Bullets, g);
 					if (m.PlayerState.Character.Health > 0) {
 						if (m.EnemyState.Character.Health == 0) {
-							Debug.Log("Boss is beatable!");
+							Debug.Log("Boss is beatable in " + m.Frame + " frames!");
+							Application.LoadLevel("main");
 							yield break;
 						}
 						ToExplore.Add (CalculatePriority (m), m);

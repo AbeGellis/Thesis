@@ -13,7 +13,7 @@ public class RandomNumberGenerator : MonoBehaviour {
 		public bool Discrete;
 	}
 
-	private Dictionary<string, GeneratedValue> GeneratedValues = new Dictionary<string, GeneratedValue> ();
+	public static Dictionary<string, GeneratedValue> GeneratedValues = new Dictionary<string, GeneratedValue> ();
 
 	public float GenerateValue(string Field, bool discrete) {
 		if (GeneratedValues.ContainsKey (Field))

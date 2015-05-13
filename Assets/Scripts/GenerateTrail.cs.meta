@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: af6183b7471ae2042b1b9dda11f6019c
+timeCreated: 1431460425
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - trailPrefab: {fileID: 193092, guid: 1869bfcc82cda6d47af64b463b9fcbbf, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

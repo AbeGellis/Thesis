@@ -116,9 +116,9 @@ public class Player : StepBasedComponent, System.ICloneable {
 		}
 	}
 
-	virtual public void HandleShoot(Vector2 velocity) {
+	virtual public GameObject HandleShoot(Vector2 velocity) {
 		if (shotTimer > 0)
-			return;
+			return null;
 
 		foreach (GameObject b in Bullets) {
 			if (!b.activeSelf) {
@@ -129,15 +129,16 @@ public class Player : StepBasedComponent, System.ICloneable {
 				                                   transform.position.y);
 
 				shotTimer = ShotDelay;
-				return;
+				return b;
 			}
 		}
+		return null;
 	
 	}
 
-	public void HandleShoot() {
+	public GameObject HandleShoot() {
 		Vector2 velocity = facingRight ? Vector2.right * ShotSpeed : Vector2.right * -ShotSpeed;
-		HandleShoot (velocity);
+		return HandleShoot (velocity);
 	}
 
 	virtual public void Landed() {}
