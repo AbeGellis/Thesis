@@ -70,7 +70,7 @@ public class EnemyDataHandler : MonoBehaviour {
 			break;
 		case 2:
 			text.text = "Player against candidate " + EnemyData[CurrentID].ID +
-				"\nMove: WAD    Shoot: Space\nReset fight: R   Generate new enemies: G\nToggle trails: T";
+				"\nMove: WAD    Shoot: Space\nReset fight: R   Generate new enemies: G\nToggle trails: T   Quit: Esc";
 			break;
 		}
 	}
@@ -152,6 +152,10 @@ public class EnemyDataHandler : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.G)) {
 			Initialize();
 			Application.LoadLevel ("randomplayertest");
+		}
+
+		if (Input.GetKeyDown (KeyCode.Escape)) {
+			Application.Quit();
 		}
 	}
 }
