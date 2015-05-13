@@ -52,12 +52,24 @@ public class Level : MonoBehaviour {
 	public bool SolidAtPoint(Vector2 point) {
 		int x = (int) (point.x / tileSize.x + .5f);
 		int y = (int) (point.y / tileSize.y + .5f);
-		return (Tiles [y, x] == Terrain.Solid);
+		
+		x = Mathf.Clamp (x, 0, Tiles.GetLength (1));
+		y = Mathf.Clamp (y, 0, Tiles.GetLength (0));
+
+		try {
+			return (Tiles [y, x] == Terrain.Solid);
+		}
+		catch (System.IndexOutOfRangeException e) {
+			Debug.LogError(e);
+			return true;
+		}
 	}
 
 	public Vector2 PointOnEdge(Vector2 point, Direction side) {
 		float x = Mathf.Floor(point.x / tileSize.x + .5f);
 		float y = Mathf.Floor(point.y / tileSize.y + .5f);
+		x = Mathf.Clamp (x, 0, Tiles.GetLength (1));
+		y = Mathf.Clamp (y, 0, Tiles.GetLength (0));
 		switch (side) {
 		case Direction.Left:
 			return new Vector2(tileSize.x * (x - .5f), point.y); 

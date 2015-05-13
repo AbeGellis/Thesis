@@ -3,18 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-public class BeatableEvaluator : MonoBehaviour {
-	public ComputerControlledPlayer Hero;
-	public Player Enemy;
-	public Bullet[] Bullets;
-	public int RenderFrequency = 5;
-	public int MaxSimulationDepth = 30;
-	
-	public int Granularity = 2;
-
-	void Awake() {
-		UnityEngine.Random.seed = (int) System.DateTime.Now.Ticks;
-	}
+public class BeatableEvaluator : Evaluator {
 
 	public class HealthHeuristic : IComparer<Priority> {
 		public int Compare(Priority p1, Priority p2) {
@@ -68,20 +57,20 @@ public class BeatableEvaluator : MonoBehaviour {
 	private SortedDictionary<Priority,GameState> ToExplore;
 
 	void Start () {
+		StepBasedComponent.Frame = 0;
 		ToExplore = new SortedDictionary<Priority, GameState> (new HealthHeuristic());
 		GameState g = new GameState (Hero, Enemy, Bullets, null);
 		ToExplore.Add (CalculatePriority (g), g);
 		Time.timeScale = 100f;
-		StartCoroutine (Simulate(MaxSimulationDepth,RenderFrequency));
+		StartCoroutine (Simulate(SimulationDepth,RenderFrequency));
 	}
 
 	void OnDisable() {
 		Time.timeScale = 1f;
 	}
 
-	//TODO use maxDepth
-	public IEnumerator Simulate(int maxDepth, int dequeuesPerUpdate) {
-		int timer = dequeuesPerUpdate;
+	public IEnumerator Simulate(int maxDepth, int renderFrequency) {
+		int timer = renderFrequency;
 
 		while (ToExplore.Count != 0) {
 			GameState g = null;
@@ -94,31 +83,35 @@ public class BeatableEvaluator : MonoBehaviour {
 			if (g == null)
 				break;
 
-			ToExplore.Remove(p);
+			ToExplore.Remove (p);
 
-			--timer;
-			if (timer <= 0) {
-				timer += dequeuesPerUpdate;
-				yield return new WaitForEndOfFrame();
-			}
 
-			for (int i = 0; i < (Controls.Jump | Controls.Left | Controls.Right | Controls.Shoot); ++i) {
-				g.RestoreGameState ((Player)Hero, Enemy, Bullets);
-				if (Hero.UsefulInput (i)) {
-					Hero.InputPressed = i;
-					for (int j = Granularity; j > 0; --j)
-						StepBasedComponent.GameStep ();
-					GameState m = new GameState (Hero, Enemy, Bullets, g);
-					if (m.PlayerState.Character.Health > 0) {
-						if (m.EnemyState.Character.Health == 0) {
-							Debug.Log("Boss is beatable in " + m.Frame + " frames!");
-							Application.LoadLevel("main");
-							yield break;
+			if (g.Frame < maxDepth) {
+				for (int i = 0; i <= (Controls.Jump | Controls.Left | Controls.Right | Controls.Shoot); ++i) {
+					g.RestoreGameState ((Player)Hero, Enemy, Bullets);
+					if (Hero.UsefulInput (i)) {
+						Hero.InputPressed = i;
+						for (int j = Granularity; j > 0; --j) {
+							StepBasedComponent.GameStep ();
+							--timer;
+							if (timer <= 0) {
+								timer += renderFrequency;
+								yield return new WaitForEndOfFrame ();
+							}
 						}
-						ToExplore.Add (CalculatePriority (m), m);
+						GameState m = new GameState (Hero, Enemy, Bullets, g);
+						if (m.PlayerState.Character.Health > 0) {
+							if (m.EnemyState.Character.Health == 0) {
+								OnSucceed(this, m.Frame);
+								yield break;
+							}
+							ToExplore.Add (CalculatePriority (m), m);
+						}
 					}
 				}
 			}
 		}
+
+		OnFail (this, maxDepth);
 	}
 }

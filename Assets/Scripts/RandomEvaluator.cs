@@ -1,15 +1,51 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class RandomEvaluator : MonoBehaviour {
+public class RandomEvaluator : Evaluator {
+	public List<int> commands;
 
-	// Use this for initialization
 	void Start () {
-	
+		StepBasedComponent.Frame = 0;
+		commands = new List<int> (SimulationDepth);
+		int x = Controls.Left | Controls.Right | Controls.Jump | Controls.Shoot;
+		for (int i = 0; i < SimulationDepth; ++i) {
+			commands.Add(Random.Range(0, x + 1));
+		}
+		Time.timeScale = 100f;
+		StartCoroutine (Simulate (commands, RenderFrequency));
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	void OnDisable() {
+		Time.timeScale = 1f;
+	}
+
+	public IEnumerator Simulate(List<int> commands, int renderFrequency) {
+		int timer = renderFrequency;
+
+		for (int i = 0; i < commands.Count; ++i) {
+			Hero.InputPressed = commands[i];
+			for (int j = 0; j < Granularity; ++j) {
+				StepBasedComponent.GameStep();
+
+				--timer;
+				if (timer <= 0) {
+					timer += renderFrequency;
+					yield return new WaitForEndOfFrame();
+				}
+			}
+			if (Enemy.Health <= 0) {
+				if (OnFail != null)
+					OnFail(this);
+				yield break;
+			}
+
+			if (Hero.Health <= 0) 
+				break;
+
+		}
+
+		if (OnSucceed != null)
+			OnSucceed(this);
 	}
 }

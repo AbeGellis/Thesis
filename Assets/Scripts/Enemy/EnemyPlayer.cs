@@ -3,7 +3,6 @@ using System.Collections;
 using System;
 
 public class EnemyPlayer : Player {
-	public RandomNumberGenerator RNG;
 	public Player foe;
 	public bool UseSeed;
 	public int Seed;
@@ -31,28 +30,28 @@ public class EnemyPlayer : Player {
 		_spriteRenderer = GetComponent<SpriteRenderer> ();
 
 		for (int i = 0; i < 3; ++i) {
-			float val = RNG.GenerateValue("State " + i.ToString() + " Type", true);
+			float val = EnemyDataHandler.GetValue("State " + i.ToString() + " Type", true);
 			States[i] = GenerateState(val);
 
 			States[i].ToControl = this;
 
-			States[i].StateHue = RNG.GenerateValue("State " + i.ToString() + " Hue", false);
+			States[i].StateHue = EnemyDataHandler.GetValue("State " + i.ToString() + " Hue", false);
 
 			for (int j = 0; j < 2; ++j) 
-				States[i].Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Argument " + j.ToString(), false);
+				States[i].Arguments[j] = EnemyDataHandler.GetValue("State " + i.ToString() + " Argument " + j.ToString(), false);
 			for (int j = 0; j < 2; ++j) {
-				float transitionType = RNG.GenerateValue("State " + i.ToString() + " Transition Type " + j.ToString(), true);
+				float transitionType = EnemyDataHandler.GetValue("State " + i.ToString() + " Transition Type " + j.ToString(), true);
 				States[i].TransitionConditions[j] = 
 					EnemyState.TransitionTypes[Mathf.FloorToInt(transitionType * EnemyState.TransitionTypes.Length)];
 				States[i].TransitionArguments[j] = 
-					RNG.GenerateValue("State " + i.ToString() + " Transition Argument " + j.ToString(), false);
+					EnemyDataHandler.GetValue("State " + i.ToString() + " Transition Argument " + j.ToString(), false);
 			}
 
-			val = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Type", true);
+			val = EnemyDataHandler.GetValue("State " + i.ToString() + " Firing Pattern Type", true);
 			States[i].FirePattern = GenerateFiringPattern(val);
 
 			for (int j = 0; j < 2; ++j) 
-				States[i].FirePattern.Arguments[j] = RNG.GenerateValue("State " + i.ToString() + " Firing Pattern Argument " + j.ToString(), false);
+				States[i].FirePattern.Arguments[j] = EnemyDataHandler.GetValue("State " + i.ToString() + " Firing Pattern Argument " + j.ToString(), false);
 		}
 
 		States [0].OtherState [0] = States [1];
