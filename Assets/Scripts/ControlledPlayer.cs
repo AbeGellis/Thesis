@@ -18,4 +18,12 @@ public class ControlledPlayer : Player {
 			HandleInput (Controls.Shoot);
 		}
 	}
+
+	override public void EndStep() {
+		GameObject g = coll.CheckCollision (CollisionCategory.EnemyAttack);
+		if (g) {
+			Health -= g.GetComponent<Bullet>().Damage;
+			g.SetActive(false);
+		}
+	}
 }

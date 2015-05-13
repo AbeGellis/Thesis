@@ -107,6 +107,16 @@ public class Player : StepBasedComponent, System.ICloneable {
 
 		if (shotTimer > 0)
 			--shotTimer;
+
+		if (Health <= 0f) {
+			GetComponent<SpriteRenderer>().enabled = false;
+			enabled = false;
+			motion.Velocity = Vector2.zero;
+			var t = GetComponent<GenerateTrail>();
+			if (t != null)
+				t.enabled = false;
+		}
+
 	}
 
 

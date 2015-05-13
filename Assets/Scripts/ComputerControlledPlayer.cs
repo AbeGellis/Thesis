@@ -49,5 +49,11 @@ public class ComputerControlledPlayer : Player {
 
 		OnLeftWall = Level.current.SolidAtPoint (l);
 		OnRightWall = Level.current.SolidAtPoint (r);
+
+		GameObject g = coll.CheckCollision (CollisionCategory.EnemyAttack);
+		if (g) {
+			Health -= g.GetComponent<Bullet>().Damage;
+			g.SetActive(false);
+		}
 	}
 }
