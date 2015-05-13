@@ -28,6 +28,7 @@ public class EnemyDataHandler : MonoBehaviour {
 	public static int CurrentID = 0;
 
 	private static bool exists = false;
+	private TextMesh text;
 	private static int longestRun = 0, bestCandidate = 0;
 
 	void Initialize() {
@@ -36,13 +37,13 @@ public class EnemyDataHandler : MonoBehaviour {
 			EnemyData.Add(new EnemyValues(i));
 	}
 
-	void Start () {
+	void Awake () {
 		if (!exists) {
+
 			exists = true;
 			DontDestroyOnLoad(gameObject);
-
 			Initialize();
-
+			OnLevelWasLoaded(0);
 			Evaluator.OnSucceed += EvalSuccess;
 			Evaluator.OnFail += EvalFailure;
 		}
@@ -52,6 +53,26 @@ public class EnemyDataHandler : MonoBehaviour {
 
 	void OnLevelWasLoaded(int level) {
 		UnityEngine.Random.seed = (int) System.DateTime.Now.Ticks;
+
+		if (text == null)
+			text = GetComponent<TextMesh>();
+
+		switch (level) {
+		case 0:
+			text.text = "Simulating randomly-controlled player against\ncandidate "
+				+ EnemyData[CurrentID].ID + 
+				"\nCulled: " + (EnemyCount - EnemyData.Count);
+			break;
+		case 1:
+			text.text = "Testing beatability of\ncandidate "
+				+ EnemyData[CurrentID].ID + 
+				"\nCulled: " + (EnemyCount - EnemyData.Count);
+			break;
+		case 2:
+			text.text = "Player against candidate " + EnemyData[CurrentID].ID +
+				"\nMove: WAD    Shoot: Space\nReset fight: R   Generate new enemies: G\nToggle trails: T";
+			break;
+		}
 	}
 
 	void EvalSuccess(Evaluator sender, int data) {
@@ -127,5 +148,10 @@ public class EnemyDataHandler : MonoBehaviour {
 
 	}
 
-
+	void Update() {
+		if (Input.GetKeyDown (KeyCode.G)) {
+			Initialize();
+			Application.LoadLevel ("randomplayertest");
+		}
+	}
 }
